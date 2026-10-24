@@ -2,7 +2,6 @@ package com.emma.islamicscreensaver;
 
 import android.service.dreams.DreamService;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -16,10 +15,7 @@ import java.util.Locale;
 public class IslamicDreamService extends DreamService {
 
     private final Handler handler = new Handler(Looper.getMainLooper());
-    private TextView clockView;
-    private TextView dateView;
-    private TextView duaView;
-    private TextView dhikrView;
+    private TextView clockView, dateView, duaView, dhikrView;
 
     private final String[] duas = {
         "اللَّهُمَّ اهْدِنِي وَسَدِّدْنِي\nAllahumma ihdini wa saddidni\nYa Allah, berilah aku petunjuk dan keteguhan.",
@@ -28,10 +24,10 @@ public class IslamicDreamService extends DreamService {
     };
 
     private final String[] dhikr = {
-        "سُبْحَانَ اللَّهِ  •  Subhanallah",
-        "الْحَمْدُ لِلَّهِ  •  Alhamdulillah",
-        "اللَّهُ أَكْبَرُ  •  Allahu Akbar",
-        "أَسْتَغْفِرُ اللَّهَ  •  Astaghfirullah"
+        "سُبْحَانَ اللَّهِ • Subhanallah",
+        "الْحَمْدُ لِلَّهِ • Alhamdulillah",
+        "اللَّهُ أَكْبَرُ • Allahu Akbar",
+        "أَسْتَغْفِرُ اللَّهَ • Astaghfirullah"
     };
 
     private int duaIndex = 0;
@@ -41,12 +37,11 @@ public class IslamicDreamService extends DreamService {
         @Override
         public void run() {
             if (clockView != null) {
-                clockView.setText(new SimpleDateFormat(
-                    "HH:mm", Locale.getDefault()).format(new Date()));
-                dateView.setText(new SimpleDateFormat(
-                    "EEEE, d MMMM yyyy", Locale.getDefault()).format(new Date()));
+                Date now = new Date();
+                clockView.setText(new SimpleDateFormat("HH:mm", Locale.getDefault()).format(now));
+                dateView.setText(new SimpleDateFormat("EEEE, d MMMM yyyy", Locale.getDefault()).format(now));
+                handler.postDelayed(this, 1000);
             }
-            handler.postDelayed(this, 1000);
         }
     };
 
@@ -58,8 +53,8 @@ public class IslamicDreamService extends DreamService {
                 dhikrView.setText(dhikr[dhikrIndex]);
                 duaIndex = (duaIndex + 1) % duas.length;
                 dhikrIndex = (dhikrIndex + 1) % dhikr.length;
+                handler.postDelayed(this, 30000);
             }
-            handler.postDelayed(this, 30000);
         }
     };
 
@@ -95,7 +90,6 @@ public class IslamicDreamService extends DreamService {
         layout.addView(dhikrView);
 
         setContentView(layout);
-
         ticker.run();
         rotateContent.run();
     }
@@ -105,5 +99,14 @@ public class IslamicDreamService extends DreamService {
         view.setTextSize(size);
         view.setTextColor(color);
         view.setGravity(Gravity.CENTER);
-        view.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
-        view.setPadding(12, 8
+        view.setPadding(12, 8, 12, 8);
+        return view;
+    }
+
+    @Override
+    public void onDreamingStopped() {
+        handler.removeCallbacks(ticker);
+        handler.removeCallbacks(rotateContent);
+        super.onDreamingStopped();
+    }
+}
