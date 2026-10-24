@@ -11,20 +11,21 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Android SDK
+      - name: Install Android SDK packages
         uses: android-actions/setup-android@v3
-        with:
-          packages: 'platforms;android-34,build-tools;34.0.0'
 
-      - name: Check Android SDK
-        run: sdkmanager --list_installed
-      - name: Show repository files
+      - name: Install platform and build tools
         run: |
-          echo "Repository checked out successfully."
-          find . -maxdepth 3 -type f | sort
+          yes | sdkmanager --licenses
+          sdkmanager "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Verify SDK
+        run: |
+          sdkmanager --list_installed
+          echo "SDK preparation completed."
